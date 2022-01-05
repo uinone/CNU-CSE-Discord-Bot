@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	token string = "NjU4OTczOTA1NDM1NzU0NTI2.XgHjRg.vCnUpWHK6nGuCxpzTT9ae8WY3_Q"
+	token string = utility.Token
 	discordSession *discordgo.Session
 )
 
