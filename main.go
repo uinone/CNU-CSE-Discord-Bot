@@ -10,14 +10,13 @@ import (
 )
 
 var (
-	TOKEN string = "NjU4OTczOTA1NDM1NzU0NTI2.XgHjRg.vCnUpWHK6nGuCxpzTT9ae8WY3_Q"
-	targetedChannelName string = "bot-test"
+	token string = "NjU4OTczOTA1NDM1NzU0NTI2.XgHjRg.vCnUpWHK6nGuCxpzTT9ae8WY3_Q"
 	discordSession *discordgo.Session
 )
 
 func init() {
 	var err error
-	discordSession, err = discordgo.New("Bot " + TOKEN)
+	discordSession, err = discordgo.New("Bot " + token)
 	utility.CheckErr(err)
 
 	err = discordSession.Open()
