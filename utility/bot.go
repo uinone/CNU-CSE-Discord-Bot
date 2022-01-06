@@ -18,7 +18,7 @@ func GetChannelIds(ds *discordgo.Session) []string {
 
 	guildIds := GetGuildIds(ds)
 
-	for _, guildId := range guildIds{
+	for _, guildId := range guildIds {
 		channels, _ := ds.GuildChannels(guildId)
 		for _, channel := range channels {
 			if (channel.Name == targetedChannelName) {
