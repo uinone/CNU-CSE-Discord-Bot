@@ -116,7 +116,7 @@ func GetChannelIds(ds *discordgo.Session) []string {
 
 ## 웹 크롤링 관련
 
-Golagn을 가지고 웹 크롤링을 하면서 겪었던 문제들과 해결 과정이에요.
+Golang을 가지고 웹 크롤링을 하면서 겪었던 문제들과 해결 과정이에요.
 
 ### 날 죽이려는 whitespace
 
