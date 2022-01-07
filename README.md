@@ -1,4 +1,4 @@
-# CNU_Discod_Bot 프로젝트
+# CNU_CSE_Discod_Bot 프로젝트
 
 [discordgo](https://github.com/bwmarrin/discordgo)와 [goquery](https://github.com/PuerkitoBio/goquery)를 활용했어요.
 
