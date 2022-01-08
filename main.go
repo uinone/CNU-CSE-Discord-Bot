@@ -10,7 +10,8 @@ import (
 )
 
 var (
-	token string = utility.Token
+	envData []string = utility.GetEnvData()
+	token string = envData[4]
 	discordSession *discordgo.Session
 )
 
@@ -27,7 +28,7 @@ func init() {
 
 func main() {
 	defer discordSession.Close()
-
+	
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, os.Interrupt)
 	<-sc
