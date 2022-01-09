@@ -31,3 +31,26 @@ func GetEnvData() []string {
 
 	return envData
 }
+
+// Update env.txt with updatedEnvData
+func UpdateEnvData(updatedEnvData []string) error {
+	buf := make([]byte, 128)
+	i := 0
+	for _, data := range updatedEnvData {
+		for j := 0; j<len(data); j++ {
+			buf[i] = data[j]
+			i++
+		}
+		buf[i] = 10
+		i++
+	}
+
+	file, err := os.Create("env.txt")
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.Write(buf[:i])
+	return err
+}
