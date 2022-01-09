@@ -1,1 +1,1 @@
-web: nomad
+web: go run main.go
