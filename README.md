@@ -22,6 +22,12 @@
   - 날 죽이려는 whitespace
   - 이상한 날짜 변환
 
+- [Go 관련](#Go-관련)
+  - Get "url" EOF
+  - 헤로쿠에 배포 어떻게 하지
+  - Gin을 써야하나
+  - go.mod는 뭐지
+
 ## 디스코드 봇 관련
 
 디스코드 봇을 만들면서 겪었던 문제들과 해결 과정이에요.
@@ -176,3 +182,56 @@ UTC는 KST보다 9시간이 느리기 때문에 자칫하면 새로운 게시글
 ```go
 now := time.Now().UTC().Add(time.Hour * 9)
 ```
+
+## Go 관련
+
+Golang을 잘 몰라서 일어난 일이에요.
+
+### Get "url" EOF
+
+웹 크롤링을 시도할 때, 명시한 url들에게 GET 요청을 보내서 페이지를 가져온다.\
+이를 url은 총 4개고 각각에 대해 동시성을 부여하기 위해 다음과 같이 시도했다.
+
+```go
+results := make(chan msgData)
+for i:=0; i<len(urls); i++ {
+	contentId, _ := strconv.Atoi(envData[i])
+	go getScrappedData(i, contentId, results)
+}
+```
+
+동시에 4개의 url에게 Get요청을 보내고 가져오므로 기존에 4개를 순서대로 요청했을 때보다 속도를 향상시킬 수 있었다.
+
+문제는 갑자기 일어나게 되었는데, 그 전에는 문제가 없다가 go 모듈을 좀 건들이고 난 후에 다음과 같은 에러가 발생했다.
+
+> Get "URL": EOF
+
+처음보는 에러였기 때문에 뭔가싶어 구글링을 해보니 [다음과 같은 질문](https://stackoverflow.com/questions/28046100/golang-http-concurrent-requests-post-eof)을 찾을 수 있었다.
+
+4개의 url로의 GET 요청이 따로 연결을 시도하는 것이 아니라, 먼저 사용하고 있던 연결을 유지하면서 다음 요청을 시도한다는 것이었다.
+
+나는 GET요청을 시도하고, 반환받은 response의 body부분을 사용하고, 그 부분만 Close를 시켜줬었다.
+
+```go
+res, err := http.Get(urls[idx])
+CheckErr(err)
+checkCode(res)
+
+defer res.Body.Close()
+```
+
+물론 저 부분도 필요하지만, 요청이 끝나면 연결 자체도 같이 닫아주지 못했다.
+
+즉, 맨 처음 GET요청을 보낼 때 사용했던 연결을 다음 GET요청이 그대로 사용하려고 하기 때문에 일어난 일이다.
+
+첫 요청때 사용되던 함수가 종료되는 시점에 연결을 끊기 때문에, 다음에 시도하려는 GET 요청들은 기존 연결을 사용해 GET 요청을 하려하고, 요청 도중 연결이 끊겨 EOF 에러를 뱉는 것이었다.
+
+#### 해결 방법
+
+```go
+res.Request.Close = true
+```
+
+위 코드를 집어넣어서 다음 요청들이 기존 연결을 계속 사용하지 않도록 하면 해결된다.
+
+조금 느려진것 같긴한데.. 아직은 잘 모르겠다.

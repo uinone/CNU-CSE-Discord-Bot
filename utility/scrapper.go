@@ -48,15 +48,21 @@ var (
 
 func SendScrappedData(ds *discordgo.Session, envData []string) {
 	results := make(chan msgData)
+	
+	fmt.Println("Reciving Data...")
 	for i:=0; i<len(urls); i++ {
 		contentId, _ := strconv.Atoi(envData[i])
 		go getScrappedData(i, contentId, results)
 	}
-
+	
 	msgs := []msgData{}
 	for i:=0; i<len(urls); i++ {
-		msgs = append(msgs, <-results)
+		msg := <-results
+		fmt.Println(msg)
+		msgs = append(msgs, msg)
 	}
+	
+	fmt.Println("Reciving Data done.")
 
 	SendMessageToChannel(ds, "모두 주목! 컴공과 공지 알림을 시작할게요🐧")
 
@@ -97,7 +103,8 @@ func getScrappedData(idx int, lastContentId int, results chan<- msgData) {
 	res, err := http.Get(urls[idx])
 	CheckErr(err)
 	checkCode(res)
-
+	
+	res.Request.Close = true
 	defer res.Body.Close()
 
 	doc, err := goquery.NewDocumentFromReader(res.Body)
