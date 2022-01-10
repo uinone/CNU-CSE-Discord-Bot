@@ -234,4 +234,26 @@ res.Request.Close = true
 
 위 코드를 집어넣어서 다음 요청들이 기존 연결을 계속 사용하지 않도록 하면 해결된다.
 
-조금 느려진것 같긴한데.. 아직은 잘 모르겠다.
+request.Close를 뜯어보니 다음과 같은 주석이 있었다.
+
+```go
+// Close indicates whether to close the connection after
+// replying to this request (for servers) or after sending this
+// request and reading its response (for clients).
+//
+// For server requests, the HTTP server handles this automatically
+// and this field is not needed by Handlers.
+//
+// For client requests, setting this field prevents re-use of
+// TCP connections between requests to the same hosts, as if
+// Transport.DisableKeepAlives were set.
+Close bool
+```
+
+Close는 서버에게 요청에 대한 답변을 주거나\
+클라이언트에게 요청을 보내고 응답을 읽고난 후에\
+연결을 닫아야하는지 아닌지를 나타낸다.
+
+클라이언트 요청에 대해, 이 필드를 설정하면\
+마치 Transport.DisableKeepAlives 가 설정된 것처럼\
+같은 호스트에 대한 요청들 사이 TCP 연결을 재사용하지 않도록 한다.
