@@ -7,18 +7,24 @@ import (
 	"os/signal"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/joho/godotenv"
 )
 
 var (
-	envData []string = utility.GetEnvData()
-	token string = envData[4]
+	lastIndexData []string = utility.GetLastIndexData()
 	discordSession *discordgo.Session
 )
 
 func init() {
 	var err error
+
+	err = godotenv.Load()
+	utility.CheckErr(err)
+	
+	token := os.Getenv("TOKEN")
 	discordSession, err = discordgo.New("Bot " + token)
 	utility.CheckErr(err)
+	
 
 	err = discordSession.Open()
 	utility.CheckErr(err)
@@ -29,8 +35,8 @@ func init() {
 func main() {
 	defer discordSession.Close()
 
-	utility.SendScrappedData(discordSession, envData)
-	
+	utility.SendScrappedData(discordSession, lastIndexData)
+
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, os.Interrupt)
 	<-sc

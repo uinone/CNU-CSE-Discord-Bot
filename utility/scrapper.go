@@ -46,13 +46,13 @@ var (
 	}
 )
 
-func SendScrappedData(ds *discordgo.Session, envData []string) {
+func SendScrappedData(ds *discordgo.Session, lastIndexData []string) {
 	now := time.Now()
 	results := make(chan msgData)
 	
 	fmt.Println("Reciving Data...")
 	for i:=0; i<len(urls); i++ {
-		contentId, _ := strconv.Atoi(envData[i])
+		contentId, _ := strconv.Atoi(lastIndexData[i])
 		go getScrappedData(i, contentId, results)
 	}
 	
@@ -65,35 +65,7 @@ func SendScrappedData(ds *discordgo.Session, envData []string) {
 	done := time.Since(now).Seconds()
 	fmt.Println("Reciving Data done.", done)
 
-	SendMessageToChannel(ds, "모두 주목! 컴공과 공지 알림을 시작할게요🐧")
-
-	for _, content := range msgs {
-		SendMessageToChannel(ds, boardName[content.idx])
-		if len(content.data) == 0 {
-			SendMessageToChannel(ds, "새로 올라온 게시글이 없습니다.\n---")
-		} else {
-			var msg string
-			for i, data := range content.data {
-				if i == 0 {
-					envData[content.idx] = strconv.Itoa(data.contentId)
-				}
-				msg = ""
-				msg = fmt.Sprint(msg, contentPropertyName[0])
-				msg = fmt.Sprintln(msg, data.title)
-				msg = fmt.Sprint(msg, contentPropertyName[1]) 
-				msg = fmt.Sprintln(msg, data.link)
-				msg = fmt.Sprint(msg, contentPropertyName[2]) 
-				msg = fmt.Sprintln(msg, data.uploadedAt)
-				msg = fmt.Sprintln(msg, "+")
-				SendMessageToChannel(ds, msg)
-			}
-			SendMessageToChannel(ds, "---")
-		}
-	}
-
-	SendMessageToChannel(ds, "업데이트가 완료됐어요!😀")
-
-	UpdateEnvData(envData)
+	SendMessageScrappedData(ds, msgs, lastIndexData)
 }
 
 func getScrappedData(idx int, lastContentId int, results chan<- msgData) {

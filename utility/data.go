@@ -5,11 +5,11 @@ import (
 	"os"
 )
 
-// Get env.txt data. Each data is seperated by '\n'
-func GetEnvData() []string {
+// Get lastIndex.txt data. Each data is seperated by '\n'
+func GetLastIndexData() []string {
 	var envData []string
 
-	file, _ := os.Open("env.txt")
+	file, _ := os.Open("lastIndex.txt")
 	defer file.Close()
 
 	buf := make([]byte, 128)
@@ -32,8 +32,8 @@ func GetEnvData() []string {
 	return envData
 }
 
-// Update env.txt with updatedEnvData
-func UpdateEnvData(updatedEnvData []string) error {
+// Update lastIndex.txt with updatedEnvData
+func UpdateLastIndexData(updatedEnvData []string) error {
 	buf := make([]byte, 128)
 	i := 0
 	for _, data := range updatedEnvData {
@@ -45,7 +45,7 @@ func UpdateEnvData(updatedEnvData []string) error {
 		i++
 	}
 
-	file, err := os.Create("env.txt")
+	file, err := os.Create("lastIndex.txt")
 	if err != nil {
 		return err
 	}
