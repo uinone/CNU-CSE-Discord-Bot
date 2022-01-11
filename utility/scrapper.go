@@ -47,6 +47,7 @@ var (
 )
 
 func SendScrappedData(ds *discordgo.Session, envData []string) {
+	now := time.Now()
 	results := make(chan msgData)
 	
 	fmt.Println("Reciving Data...")
@@ -57,12 +58,12 @@ func SendScrappedData(ds *discordgo.Session, envData []string) {
 	
 	msgs := []msgData{}
 	for i:=0; i<len(urls); i++ {
-		msg := <-results
-		fmt.Println(msg)
-		msgs = append(msgs, msg)
+		msgs = append(msgs, <-results)
 	}
-	
-	fmt.Println("Reciving Data done.")
+
+	fmt.Println(msgs)
+	done := time.Since(now).Seconds()
+	fmt.Println("Reciving Data done.", done)
 
 	SendMessageToChannel(ds, "모두 주목! 컴공과 공지 알림을 시작할게요🐧")
 
@@ -93,23 +94,25 @@ func SendScrappedData(ds *discordgo.Session, envData []string) {
 	SendMessageToChannel(ds, "업데이트가 완료됐어요!😀")
 
 	UpdateEnvData(envData)
-
-	fmt.Println("스크랩이 끝났습니다.")
 }
 
 func getScrappedData(idx int, lastContentId int, results chan<- msgData) {
-	scrapped := []ScrappedData{}
+	req, err := http.NewRequest("GET", urls[idx], nil)
+	CheckErr(err)
+	req.Close = true
 
-	res, err := http.Get(urls[idx])
+	client := &http.Client{}
+	res, err := client.Do(req)
 	CheckErr(err)
 	checkCode(res)
-	
-	res.Request.Close = true
+
 	defer res.Body.Close()
 
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	CheckErr(err)
 
+	scrapped := []ScrappedData{}
+	
 	doc.Find("tbody").Find("tr").Each(func(i int, s *goquery.Selection) {
 		num, _ := strconv.Atoi(cleanString(s.Find(".b-num-box").Text()))
 		if num > lastContentId {

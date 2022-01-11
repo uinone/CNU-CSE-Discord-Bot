@@ -226,13 +226,11 @@ defer res.Body.Close()
 
 첫 요청때 사용되던 함수가 종료되는 시점에 연결을 끊기 때문에, 다음에 시도하려는 GET 요청들은 기존 연결을 사용해 GET 요청을 하려하고, 요청 도중 연결이 끊겨 EOF 에러를 뱉는 것이었다.
 
-#### 해결 방법
-
 ```go
 res.Request.Close = true
 ```
 
-위 코드를 집어넣어서 다음 요청들이 기존 연결을 계속 사용하지 않도록 하면 해결된다.
+위 코드를 집어넣어서 다음 요청들이 기존 연결을 계속 사용하지 않도록 하면 해결될 줄 알았다.
 
 request.Close를 뜯어보니 다음과 같은 주석이 있었다.
 
@@ -257,3 +255,32 @@ Close는 서버에게 요청에 대한 답변을 주거나\
 클라이언트 요청에 대해, 이 필드를 설정하면\
 마치 Transport.DisableKeepAlives 가 설정된 것처럼\
 같은 호스트에 대한 요청들 사이 TCP 연결을 재사용하지 않도록 한다.
+
+아쉽게도 저 코드 한 줄이 문제를 해결해주지 못했다.\
+되는줄 알았는데, 운이 좋아서 가끔 동작했을 뿐 여전히 TCP 연결을 재사용하고 있었다.
+
+그래서 [golang-korea](https://www.facebook.com/groups/golangko/about)에 질문을 올렸고 좋은 답변을 얻을 수 있었다.
+
+해결하지 못한 이유는 request.Close라는 설정이 되지 않았기 때문이었다.
+
+#### 해결 방법
+
+물론 request.Close라는 설정이 필요한것도 맞았다.
+
+하지만 request.Close를 true로 설정한 클라이언트를 만들지 않아서 제대로 동작하지 않았던 것이었다.\
+따라서 GET 요청 자체를 새로 만들어서 request.Close 설정을 만들어준 후, 클라이언트 객체를 가지고 요청을 보내주면 해결됐다.
+
+```go
+req, err := http.NewRequest("GET", urls[idx], nil)
+CheckErr(err)
+req.Close = true
+
+client := &http.Client{}
+res, err := client.Do(req)
+CheckErr(err)
+checkCode(res)
+
+defer res.Body.Close()
+```
+
+너무 안일하게 GET요청을 보냈던 것 같다..
