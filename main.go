@@ -14,7 +14,7 @@ func main() {
 	ds := utility.BotInit()
 	defer ds.Close()
 
-	utility.RunAlarm(ds, time.Hour)
+	utility.RunAlarm(ds, time.Minute)
 
 	port := os.Getenv("PORT")
 
