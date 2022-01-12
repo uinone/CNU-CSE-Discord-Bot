@@ -65,7 +65,7 @@ func sendMessageToChannel(ds *discordgo.Session, msg string) {
 
 // Get channel ids from guilds
 func getChannelIds(ds *discordgo.Session) []string {
-	targetedChannelName := "bot-test"
+	targetedChannelName := "컴공과-공지사항"
 	var channelIds []string
 
 	guildIds := getGuildIds(ds)
