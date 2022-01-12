@@ -1,6 +1,6 @@
 # CNU_CSE_Discod_Bot 프로젝트
 
-[discordgo](https://github.com/bwmarrin/discordgo)와 [goquery](https://github.com/PuerkitoBio/goquery)를 활용했어요.
+[discordgo](https://github.com/bwmarrin/discordgo), [goquery](https://github.com/PuerkitoBio/goquery) 그리고 [gin](https://github.com/gin-gonic/gin)을 활용했어요.
 
 ## 봇은 이렇게 동작해요😀
 
