@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,6 +13,8 @@ import (
 func main() {
 	ds := utility.BotInit()
 	defer ds.Close()
+
+	utility.RunAlarm(ds, time.Hour)
 
 	port := os.Getenv("PORT")
 
