@@ -45,6 +45,7 @@ var (
 		"[업로드 날짜] ",
 	}
 )
+
 // Get Info data parsed from scrapped data
 func getInfoData(ds *discordgo.Session) [][]string {
 	now := time.Now()
@@ -71,6 +72,7 @@ func getInfoData(ds *discordgo.Session) [][]string {
 	return formatScrappedData(info, lastIndexData)
 }
 
+// Format scrapped data(infoData) to strings
 func formatScrappedData(infoSet []infoData, lastIndexData []string) [][]string {
 	formatedDataSet := [][]string{}
 
@@ -114,6 +116,7 @@ func formatScrappedData(infoSet []infoData, lastIndexData []string) [][]string {
 	return formatedDataSet
 }
 
+// Get scrapped data by using web scrapping concurrently
 func getScrappedData(idx int, lastContentId int, results chan<- infoData) {
 	req, err := http.NewRequest("GET", urls[idx], nil)
 	checkErr(err)
@@ -157,6 +160,7 @@ func getScrappedData(idx int, lastContentId int, results chan<- infoData) {
 	results <- infoData{idx: idx, data: scrapped}
 }
 
+// Get day count from now
 func getDayCountFromNow(t time.Time) string {
 	now := time.Now().Add(time.Hour * 9)
 	days := int(now.Sub(t).Hours() / 24)
@@ -169,22 +173,26 @@ func getDayCountFromNow(t time.Time) string {
 	return dayCount
 }
 
+// Change string(time) to time.Time(date)
 func changeTimeToDate(str string) time.Time {
 	strDate := strings.Join(strings.Split(str, "."), "-")
 	t, _ := time.Parse("06-01-02", strDate)
 	return t
 }
 
+// Clean string by using strings.TrimSpace
 func cleanString(str string) string {
 	return strings.TrimSpace(str)
 }
 
+// Check that response's status code is 200
 func checkCode(res *http.Response) {
 	if res.StatusCode != 200 {
 		log.Fatalln("Request failed with Status:", res.StatusCode)
 	}
 }
 
+// Check err is nil
 func checkErr(err error) {
 	if err != nil {
 		log.Fatalln(err)

@@ -8,6 +8,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+// Discord bot initialization
 func BotInit() *discordgo.Session {
 	var err error
 	var discordSession *discordgo.Session
@@ -25,6 +26,7 @@ func BotInit() *discordgo.Session {
 	return discordSession
 }
 
+// Run alarm regularly
 func RunAlarm(ds *discordgo.Session, duration time.Duration) {
 	ticker := time.NewTicker(duration)
 	go func() {
