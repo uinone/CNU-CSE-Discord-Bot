@@ -12,7 +12,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-type ScrappedData struct {
+type scrappedData struct {
 	contentId	int
 	title 		string
 	link 		string
@@ -21,22 +21,38 @@ type ScrappedData struct {
 
 type infoData struct {
 	idx 	int
-	data 	[]ScrappedData
+	data 	[]scrappedData
 }
 
-var urls = [4]string{
+var (
+	urls = [4]string{
 		"https://computer.cnu.ac.kr/computer/notice/bachelor.do",
 		"https://computer.cnu.ac.kr/computer/notice/notice.do",
 		"https://computer.cnu.ac.kr/computer/notice/project.do",
 		"https://computer.cnu.ac.kr/computer/notice/job.do",
 	}
+	
+	boardName = [4]string {
+		"🎨 학사공지 🎨",
+		"📜 일반소식 📜",
+		"🔆 사업단소식 🔆",
+		"🎈 취업정보 🎈 ※취업정보는 로그인해야 볼 수 있어요!😅",
+	}
 
+	contentPropertyName = [3]string {
+		"[제목] ",
+		"[링크] ",
+		"[업로드 날짜] ",
+	}
+)
 // Get Info data parsed from scrapped data
-func GetInfoData(ds *discordgo.Session, lastIndexData []string) []infoData {
+func getInfoData(ds *discordgo.Session) [][]string {
 	now := time.Now()
 	
 	results := make(chan infoData)
 	defer close(results)
+
+	lastIndexData := getLastIndexData()
 
 	fmt.Println("Reciving Data...")
 	for i:=0; i<len(urls); i++ {
@@ -52,25 +68,68 @@ func GetInfoData(ds *discordgo.Session, lastIndexData []string) []infoData {
 	done := time.Since(now).Seconds()
 	fmt.Println("Reciving Data done.", done)
 
-	return info
+	return formatScrappedData(info, lastIndexData)
+}
+
+func formatScrappedData(infoSet []infoData, lastIndexData []string) [][]string {
+	formatedDataSet := [][]string{}
+
+	for _, info := range infoSet {
+		formatedData := []string{}
+		if len(info.data) == 0 {
+			continue
+		}
+		formatedData = append(formatedData, boardName[info.idx])
+
+		var tmpMsg string
+		for i, content := range info.data {
+			if i == 0 {
+				lastIndexData[info.idx] = strconv.Itoa(content.contentId)
+			}
+			tmpMsg = ""
+			tmpMsg = fmt.Sprint(tmpMsg, contentPropertyName[0])
+			tmpMsg = fmt.Sprintln(tmpMsg, content.title)
+			formatedData = append(formatedData, tmpMsg)
+
+			tmpMsg = ""
+			tmpMsg = fmt.Sprint(tmpMsg, contentPropertyName[1]) 
+			tmpMsg = fmt.Sprintln(tmpMsg, content.link)
+			formatedData = append(formatedData, tmpMsg)
+
+			tmpMsg = ""
+			tmpMsg = fmt.Sprint(tmpMsg, contentPropertyName[2]) 
+			tmpMsg = fmt.Sprintln(tmpMsg, content.uploadedAt)
+			tmpMsg = fmt.Sprintln(tmpMsg, "+")
+
+			formatedData = append(formatedData, tmpMsg)
+		}
+
+		formatedData = append(formatedData, "---")
+
+		formatedDataSet = append(formatedDataSet, formatedData)
+	}
+
+	updateLastIndexData(lastIndexData)
+
+	return formatedDataSet
 }
 
 func getScrappedData(idx int, lastContentId int, results chan<- infoData) {
 	req, err := http.NewRequest("GET", urls[idx], nil)
-	CheckErr(err)
+	checkErr(err)
 	req.Close = true
 
 	client := &http.Client{}
 	res, err := client.Do(req)
-	CheckErr(err)
+	checkErr(err)
 	checkCode(res)
 
 	defer res.Body.Close()
 
 	doc, err := goquery.NewDocumentFromReader(res.Body)
-	CheckErr(err)
+	checkErr(err)
 
-	scrapped := []ScrappedData{}
+	scrapped := []scrappedData{}
 	
 	doc.Find("tbody").Find("tr").Each(func(i int, s *goquery.Selection) {
 		num, _ := strconv.Atoi(cleanString(s.Find(".b-num-box").Text()))
@@ -82,11 +141,11 @@ func getScrappedData(idx int, lastContentId int, results chan<- infoData) {
 			var uploadedAt string
 			s.Find("td").Each(func(i int, s *goquery.Selection) {
 				if (i == 4) {
-					uploadedAt = getDayCountFromNow(ChangeTimeToDate(cleanString(s.Text())))
+					uploadedAt = getDayCountFromNow(changeTimeToDate(cleanString(s.Text())))
 				}
 			})
 			
-			scrapped = append(scrapped, ScrappedData{
+			scrapped = append(scrapped, scrappedData{
 				contentId: num,
 				title: title,
 				link: link,
@@ -110,7 +169,7 @@ func getDayCountFromNow(t time.Time) string {
 	return dayCount
 }
 
-func ChangeTimeToDate(str string) time.Time {
+func changeTimeToDate(str string) time.Time {
 	strDate := strings.Join(strings.Split(str, "."), "-")
 	t, _ := time.Parse("06-01-02", strDate)
 	return t
@@ -126,7 +185,7 @@ func checkCode(res *http.Response) {
 	}
 }
 
-func CheckErr(err error) {
+func checkErr(err error) {
 	if err != nil {
 		log.Fatalln(err)
 	}

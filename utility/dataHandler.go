@@ -1,13 +1,12 @@
 package utility
 
 import (
-	"fmt"
 	"io"
 	"os"
 )
 
 // Get lastIndex.txt data. Each data is seperated by '\n'
-func GetLastIndexData() []string {
+func getLastIndexData() []string {
 	var envData []string
 
 	file, _ := os.Open("lastIndex.txt")
@@ -36,8 +35,7 @@ func GetLastIndexData() []string {
 }
 
 // Update lastIndex.txt with updatedEnvData
-func UpdateLastIndexData(updatedEnvData []string) error {
-	fmt.Println(updatedEnvData)
+func updateLastIndexData(updatedEnvData []string) error {
 	buf := make([]byte, 128)
 	i := 0
 	for _, data := range updatedEnvData {
