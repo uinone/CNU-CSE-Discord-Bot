@@ -7,20 +7,38 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func SendMessageScrappedData(ds *discordgo.Session, msgs []msgData, lastIndexData []string) {
+var (
+	boardName = [4]string {
+		"🎨 학사공지 🎨",
+		"📜 일반소식 📜",
+		"🔆 사업단소식 🔆",
+		"🎈 취업정보 🎈 ※취업정보는 로그인해야 볼 수 있어요!😅",
+	}
+
+	contentPropertyName = [3]string {
+		"[제목] ",
+		"[링크] ",
+		"[업로드 날짜] ",
+	}
+)
+
+// Send information to specified channel
+func SendInfoToChannel(ds *discordgo.Session, lastIndexData []string) {
+	info := GetInfoData(ds, lastIndexData)
+
 	SendMessageToChannel(ds, "모두 주목! 컴공과 공지 알림을 시작할게요🐧")
 
-	for _, content := range msgs {
+	var msg string
+	for _, content := range info {
 		SendMessageToChannel(ds, boardName[content.idx])
+
 		if len(content.data) == 0 {
 			SendMessageToChannel(ds, "새로 올라온 게시글이 없습니다.\n---")
 		} else {
-			var msg string
 			for i, data := range content.data {
 				if i == 0 {
 					lastIndexData[content.idx] = strconv.Itoa(data.contentId)
 				}
-				msg = ""
 				msg = fmt.Sprint(msg, contentPropertyName[0])
 				msg = fmt.Sprintln(msg, data.title)
 				msg = fmt.Sprint(msg, contentPropertyName[1]) 

@@ -35,7 +35,7 @@ func init() {
 func main() {
 	defer discordSession.Close()
 
-	utility.SendScrappedData(discordSession, lastIndexData)
+	utility.SendInfoToChannel(discordSession, lastIndexData)
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, os.Interrupt)

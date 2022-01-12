@@ -19,56 +19,43 @@ type ScrappedData struct {
 	uploadedAt 	string
 }
 
-type msgData struct {
+type infoData struct {
 	idx 	int
 	data 	[]ScrappedData
 }
 
-var (
-	urls = [4]string{
+var urls = [4]string{
 		"https://computer.cnu.ac.kr/computer/notice/bachelor.do",
 		"https://computer.cnu.ac.kr/computer/notice/notice.do",
 		"https://computer.cnu.ac.kr/computer/notice/project.do",
 		"https://computer.cnu.ac.kr/computer/notice/job.do",
 	}
 
-	boardName = [4]string {
-		"🎨 학사공지 🎨",
-		"📜 일반소식 📜",
-		"🔆 사업단소식 🔆",
-		"🎈 취업정보 🎈 ※취업정보는 로그인해야 볼 수 있어요!😅",
-	}
-
-	contentPropertyName = [3]string {
-		"[제목] ",
-		"[링크] ",
-		"[업로드 날짜] ",
-	}
-)
-
-func SendScrappedData(ds *discordgo.Session, lastIndexData []string) {
+// Get Info data parsed from scrapped data
+func GetInfoData(ds *discordgo.Session, lastIndexData []string) []infoData {
 	now := time.Now()
-	results := make(chan msgData)
 	
+	results := make(chan infoData)
+	defer close(results)
+
 	fmt.Println("Reciving Data...")
 	for i:=0; i<len(urls); i++ {
 		contentId, _ := strconv.Atoi(lastIndexData[i])
 		go getScrappedData(i, contentId, results)
 	}
 	
-	msgs := []msgData{}
+	info := []infoData{}
 	for i:=0; i<len(urls); i++ {
-		msgs = append(msgs, <-results)
+		info = append(info, <-results)
 	}
 
-	fmt.Println(msgs)
 	done := time.Since(now).Seconds()
 	fmt.Println("Reciving Data done.", done)
 
-	SendMessageScrappedData(ds, msgs, lastIndexData)
+	return info
 }
 
-func getScrappedData(idx int, lastContentId int, results chan<- msgData) {
+func getScrappedData(idx int, lastContentId int, results chan<- infoData) {
 	req, err := http.NewRequest("GET", urls[idx], nil)
 	CheckErr(err)
 	req.Close = true
@@ -108,7 +95,7 @@ func getScrappedData(idx int, lastContentId int, results chan<- msgData) {
 		}
 	})
 
-	results <- msgData{idx: idx, data: scrapped}
+	results <- infoData{idx: idx, data: scrapped}
 }
 
 func getDayCountFromNow(t time.Time) string {
