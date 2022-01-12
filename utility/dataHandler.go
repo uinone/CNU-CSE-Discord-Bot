@@ -1,6 +1,7 @@
 package utility
 
 import (
+	"fmt"
 	"io"
 	"os"
 )
@@ -27,13 +28,16 @@ func GetLastIndexData() []string {
 			data = ""
 		}
 	}
-	envData = append(envData, data)
+	if len(envData) < 4 {
+		envData = append(envData, data)
+	}
 
 	return envData
 }
 
 // Update lastIndex.txt with updatedEnvData
 func UpdateLastIndexData(updatedEnvData []string) error {
+	fmt.Println(updatedEnvData)
 	buf := make([]byte, 128)
 	i := 0
 	for _, data := range updatedEnvData {

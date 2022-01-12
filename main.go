@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/joho/godotenv"
@@ -35,9 +36,19 @@ func init() {
 func main() {
 	defer discordSession.Close()
 
-	utility.SendInfoToChannel(discordSession, lastIndexData)
+	runAlarm(time.Hour)
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, os.Interrupt)
 	<-sc
+}
+
+func runAlarm(duration time.Duration) {
+	ticker := time.NewTicker(duration)
+	go func() {
+		for t := range ticker.C {
+			fmt.Println(t)
+			utility.SendInfoToChannel(discordSession, lastIndexData)
+		}
+	}()
 }
