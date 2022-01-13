@@ -144,7 +144,7 @@ func getScrappedData(idx int, lastContentId int, results chan<- infoData) {
 			var uploadedAt string
 			s.Find("td").Each(func(i int, s *goquery.Selection) {
 				if (i == 4) {
-					uploadedAt = getDayCountFromNow(changeTimeToDate(cleanString(s.Text())))
+					uploadedAt = cleanString(s.Text())
 				}
 			})
 			
@@ -158,26 +158,6 @@ func getScrappedData(idx int, lastContentId int, results chan<- infoData) {
 	})
 
 	results <- infoData{idx: idx, data: scrapped}
-}
-
-// Get day count from now
-func getDayCountFromNow(t time.Time) string {
-	now := time.Now().Add(time.Hour * 9)
-	days := int(now.Sub(t).Hours() / 24)
-	var dayCount string
-	if days == 0 {
-		dayCount = "오늘"
-	} else {
-		dayCount = strconv.Itoa(days) + "일전"
-	}
-	return dayCount
-}
-
-// Change string(time) to time.Time(date)
-func changeTimeToDate(str string) time.Time {
-	strDate := strings.Join(strings.Split(str, "."), "-")
-	t, _ := time.Parse("06-01-02", strDate)
-	return t
 }
 
 // Clean string by using strings.TrimSpace
