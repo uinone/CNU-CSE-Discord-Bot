@@ -1,6 +1,7 @@
 package utility
 
 import (
+	"fmt"
 	"io"
 	"os"
 )
@@ -35,10 +36,12 @@ func getLastIndexData() []string {
 }
 
 // Update lastIndex.txt with updatedEnvData
-func updateLastIndexData(updatedEnvData []string) error {
+func updateLastIndexData(updatedIndexData []string) error {
+	fmt.Println("from", getLastIndexData())
+	fmt.Println("to", updatedIndexData)
 	buf := make([]byte, 128)
 	i := 0
-	for _, data := range updatedEnvData {
+	for _, data := range updatedIndexData {
 		for j := 0; j<len(data); j++ {
 			buf[i] = data[j]
 			i++
