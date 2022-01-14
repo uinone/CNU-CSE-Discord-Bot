@@ -11,6 +11,12 @@ import (
 )
 
 func main() {
+	ds := utility.BotInit()
+	defer ds.Close()
+	
+	utility.SendInfoToChannel(ds)
+	utility.RunAlarm(ds, time.Minute * 30)
+
 	port := os.Getenv("PORT")
 
     if port == "" {
@@ -26,9 +32,4 @@ func main() {
     })
 
 	router.Run(":" + port)
-
-	ds := utility.BotInit()
-	defer ds.Close()
-
-	utility.RunAlarm(ds, time.Minute * 30)
 }

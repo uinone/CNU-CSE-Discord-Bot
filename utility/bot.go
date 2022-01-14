@@ -32,13 +32,13 @@ func RunAlarm(ds *discordgo.Session, duration time.Duration) {
 	go func() {
 		for t := range ticker.C {
 			fmt.Println(t)
-			sendInfoToChannel(ds)
+			SendInfoToChannel(ds)
 		}
 	}()
 }
 
 // Send information to specified channel
-func sendInfoToChannel(ds *discordgo.Session) {
+func SendInfoToChannel(ds *discordgo.Session) {
 	infoSet := getInfoData(ds)
 
 	if len(infoSet) > 0 {
