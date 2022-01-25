@@ -6,13 +6,15 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/joho/godotenv"
 )
 
 // Discord bot initialization
 func BotInit() *discordgo.Session {
 	var err error
 	var discordSession *discordgo.Session
-	
+
+	_ = godotenv.Load()
 	token := os.Getenv("TOKEN")
 	discordSession, err = discordgo.New("Bot " + token)
 	checkErr(err)
@@ -93,4 +95,12 @@ func getGuildIds(ds *discordgo.Session) []string {
 	}
 
 	return guildIds
+}
+
+func GetRecentMsgs(ds *discordgo.Session) {
+	channelIds := getChannelIds(ds)
+	msgs, _ := ds.ChannelMessages(channelIds[0], 10, "", "", "")
+	for _, msg := range msgs {
+		fmt.Println(msg.Content)
+	}
 }
