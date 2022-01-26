@@ -21,7 +21,7 @@
 봇이 변경사항을 올리는 시점을 기준으로 몇일 지났는지를 표시하면 좋겠다고 생각했는데\
 보는 사람 입장에서는 그냥 날짜를 보여주는 게 더 나은 것 같아서 업로드 날짜 그대로 표시하기로 했다.
 
-### 변경 사항 정리
+#### 변경 사항 정리
 
 > 변경 전\
 > [업로드 날짜]: N일전\
@@ -34,6 +34,7 @@
 - [디스코드 봇 관련](#디스코드-봇-관련)
   - 계속 꺼지는 프로그램
   - 비어있는 session.State.Guilds.Channels
+  - error closing resp body
 
 * [웹 크롤링 관련](#웹-크롤링-관련)
   - 날 죽이려는 whitespace
@@ -136,6 +137,29 @@ func GetChannelIds(ds *discordgo.Session) []string {
 	return channelIds
 }
 ```
+
+### error closing resp body
+
+heroku에서 봇을 돌리는데 자꾸 짜증나게 하는 에러가 있었다.
+
+> 2022/01/26 17:00:26 error closing resp body
+
+response body를 닫는 것에 대해 진짜 모든 방법을 다 동원했었다.
+
+defer를 사용해서 함수가 끝나기 전에 response body를 닫기도 했고,\
+GET요청을 보내는 Client객체에 TCP통신을 계속 잡고있지 않도록 하는 조치도 했었다.
+
+하지만 error closing resp body라니.. 나랑 싸우자는 줄 알았다.
+
+그래서 열심히 찾아보던 중 [다음과 같은 이슈](https://github.com/bwmarrin/discordgo/issues/1028)를 발견할 수 있었다.
+
+알고보니 go 1.17.3 버전의 오류였던 것이다.
+
+#### 해결 방법
+
+이슈에 나온 방법처럼 heroku의 go 버전을 1.17.2 혹은 1.17.4 이상의 버전을 사용하면 해결되는 문제였다.
+
+아쉽게도 heroku의 최신 go 버전이 1.17.3이었기 때문에 1.17.2로 내리는 결정을 해서 오류를 해결했다.
 
 ## 웹 크롤링 관련
 
