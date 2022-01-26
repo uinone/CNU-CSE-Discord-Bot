@@ -43,7 +43,7 @@ func RunAlarm(ds *discordgo.Session, duration time.Duration) {
 func SendInfoToChannel(ds *discordgo.Session) {
 	infoSet := getInfoData(ds)
 
-	if len(infoSet) > 0 {
+	if len(infoSet) > 1 {
 		sendMessageToChannel(ds, "모두 주목! 컴공과 공지 알림을 시작할게요🐧")
 
 		for _, info := range infoSet {
