@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/joho/godotenv"
 )
 
 // Discord bot initialization
@@ -15,7 +14,7 @@ func BotInit() *discordgo.Session {
 	var err error
 	var discordSession *discordgo.Session
 
-	_ = godotenv.Load()
+	//_ = godotenv.Load()
 	token := os.Getenv("TOKEN")
 	discordSession, err = discordgo.New("Bot " + token)
 	checkErr(err)

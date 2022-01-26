@@ -7,7 +7,6 @@ require (
 	github.com/PuerkitoBio/goquery v1.8.0
 	github.com/bwmarrin/discordgo v0.23.2
 	github.com/gin-gonic/gin v1.7.7
-	github.com/joho/godotenv v1.4.0
 )
 
 require (
