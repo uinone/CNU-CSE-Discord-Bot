@@ -53,7 +53,7 @@ func getInfoData(ds *discordgo.Session) [][]string {
 	results := make(chan infoData)
 	defer close(results)
 
-	lastIndexData := getLastIndexData()
+	lastIndexData := getLastIndexData(ds)
 
 	fmt.Println("Reciving Data...")
 	for i:=0; i<len(urls); i++ {
@@ -111,7 +111,12 @@ func formatScrappedData(infoSet []infoData, lastIndexData []string) [][]string {
 		formatedDataSet = append(formatedDataSet, formatedData)
 	}
 
-	updateLastIndexData(lastIndexData)
+	lastIndexes := "$"
+	for _, lastIndex := range lastIndexData {
+		lastIndexes = fmt.Sprint(lastIndexes, lastIndex + " ")
+	}
+
+	formatedDataSet = append(formatedDataSet, []string{lastIndexes})
 
 	return formatedDataSet
 }

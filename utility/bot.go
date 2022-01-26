@@ -3,6 +3,7 @@ package utility
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
@@ -97,10 +98,25 @@ func getGuildIds(ds *discordgo.Session) []string {
 	return guildIds
 }
 
-func GetRecentMsgs(ds *discordgo.Session) {
+func getLastIndexData(ds *discordgo.Session) []string {
+	var lastIndexData []string
+	flag := false
+
 	channelIds := getChannelIds(ds)
-	msgs, _ := ds.ChannelMessages(channelIds[0], 10, "", "", "")
-	for _, msg := range msgs {
-		fmt.Println(msg.Content)
+	for _, channelId := range channelIds {
+		msgs, _ := ds.ChannelMessages(channelId, 3, "", "", "")
+		for _, msg := range msgs {
+			if msg.Content[0] == '$' {
+				lastIndex := msg.Content[1:]
+				lastIndexData = strings.Split(lastIndex, " ")
+				flag = true
+			}
+		}
+
+		if flag {
+			break
+		}
 	}
+
+	return lastIndexData
 }

@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,10 +14,8 @@ func main() {
 	ds := utility.BotInit()
 	defer ds.Close()
 
-	utility.GetRecentMsgs(ds)
-
-	//utility.SendInfoToChannel(ds)
-	//utility.RunAlarm(ds, time.Minute * 30)
+	utility.SendInfoToChannel(ds)
+	utility.RunAlarm(ds, time.Minute * 30)
 
 	port := os.Getenv("PORT")
 
