@@ -18,6 +18,10 @@ func main() {
 	utility.RunAlarm(ds, time.Minute * 30)
 
 	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
+
 
     if port == "" {
         log.Fatal("$PORT must be set")
