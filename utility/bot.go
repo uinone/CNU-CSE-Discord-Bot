@@ -102,6 +102,7 @@ func getLastIndexData(ds *discordgo.Session) []string {
 	flag := false
 
 	channelIds := getChannelIds(ds)
+
 	for _, channelId := range channelIds {
 		msgs, _ := ds.ChannelMessages(channelId, 3, "", "", "")
 		for _, msg := range msgs {
@@ -109,6 +110,7 @@ func getLastIndexData(ds *discordgo.Session) []string {
 				lastIndex := msg.Content[1:]
 				lastIndexData = strings.Split(lastIndex, " ")
 				flag = true
+				break
 			}
 		}
 
@@ -117,5 +119,5 @@ func getLastIndexData(ds *discordgo.Session) []string {
 		}
 	}
 
-	return lastIndexData
+	return lastIndexData[:4]
 }
