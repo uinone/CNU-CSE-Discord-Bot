@@ -35,6 +35,7 @@
   - 계속 꺼지는 프로그램
   - 비어있는 session.State.Guilds.Channels
   - error closing resp body
+  - 60초 안에 해보세요
 
 * [웹 크롤링 관련](#웹-크롤링-관련)
   - 날 죽이려는 whitespace
@@ -160,6 +161,35 @@ GET요청을 보내는 Client객체에 TCP통신을 계속 잡고있지 않도�
 이슈에 나온 방법처럼 heroku의 go 버전을 1.17.2 혹은 1.17.4 이상의 버전을 사용하면 해결되는 문제였다.
 
 아쉽게도 heroku의 최신 go 버전이 1.17.3이었기 때문에 1.17.2로 내리는 결정을 해서 오류를 해결했다.
+
+### 60초 안에 해보세요
+
+갑자기 봇이 죽었다.
+
+몇주 잘 돌다가 죽으니까 뭐가 문제인지 모르겠어서 눈물이 났다.
+
+그래서 한참을 콘솔에 찍으면서 알아봤지만, 오류는 잘 보이지 않았다.
+
+커멘드 창에 `heroku logs -a 봇이름 --tail`을 치면 로그가 나온다.
+
+이걸 살펴보니까 다음과 같은 로그가 찍혀있었다.
+
+> 2022-02-17T13:18:44.622932+00:00 heroku[web.1]: Error R10 (Boot timeout) -> Web process failed to bind to $PORT within 60 seconds of launch
+
+저 로그를 왜 지나쳤을까.
+
+60초 안에 크롤링과 디스코드에 메시지 보내기를 같이 해야하는 상황이 발생한 것이다.
+
+#### 해결 방법
+
+문제가 발생한건 main.go에서 다음 한 줄 때문이었다.
+
+```go
+utility.SendInfoToChannel(ds) // <--
+utility.RunAlarm(ds, time.Minute * 30)
+```
+
+그래서 저 부분을 지우면서 해결할 수 있었다.
 
 ## 웹 크롤링 관련
 

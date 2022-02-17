@@ -14,14 +14,12 @@ func main() {
 	ds := utility.BotInit()
 	defer ds.Close()
 
-	utility.SendInfoToChannel(ds)
 	utility.RunAlarm(ds, time.Minute * 30)
 
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "3000"
 	}
-
 
     if port == "" {
         log.Fatal("$PORT must be set")
