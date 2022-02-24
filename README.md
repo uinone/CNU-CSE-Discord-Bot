@@ -211,6 +211,8 @@ utility.RunAlarm(ds, time.Minute * 30)
 
 따라서 저 부분을 지움으로써 해결할 수 있었다.
 
+---
+
 ## 웹 크롤링 관련
 
 Golang을 가지고 웹 크롤링을 하면서 겪었던 문제들과 해결 과정이에요.
@@ -273,6 +275,8 @@ UTC는 KST보다 9시간이 느리기 때문에 자칫하면 새로운 게시글
 ```go
 now := time.Now().UTC().Add(time.Hour * 9)
 ```
+
+---
 
 ## Go 관련
 
@@ -375,6 +379,8 @@ defer res.Body.Close()
 ```
 
 너무 안일하게 GET요청을 보냈던 것 같다..
+
+---
 
 ## Heroku 관련
 
