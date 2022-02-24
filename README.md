@@ -2,6 +2,8 @@
 
 [discordgo](https://github.com/bwmarrin/discordgo), [goquery](https://github.com/PuerkitoBio/goquery) 그리고 [gin](https://github.com/gin-gonic/gin)을 활용했어요.
 
+서버에 추가하고 싶으시면 [링크](https://discordapp.com/api/oauth2/authorize?client_id=658973905435754526&permissions=100352&scope=bot)를 클릭해주세요.
+
 ## 봇은 이렇게 동작해요😀
 
 봇은 다음과 같이 동작해요.
@@ -9,6 +11,9 @@
 1. 충남대학교 컴퓨터융합학부의 게시판들이 업데이트 되는 것을 30분마다 한번씩 24시간동안 확인합니다.
 2. 해당 봇을 추가한 서버들의 특정 채팅채널(이름은 "컴공과-공지사항"여야해요)에서 볼 수 있도록 업데이트 된 게시글의 정보를 웹에서 긁어옵니다.
 3. 긁어온 데이터를 채팅채널에 메시지 형태로 보내줍니다.
+
+봇은 평균 0~30분 안에 올라온 게시글을 확인해서 알려줍니다.\
+아무리 느려도 1시간 30분안에는 정보를 제공해요!
 
 ## 업데이트 목록
 

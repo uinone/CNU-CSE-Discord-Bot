@@ -29,6 +29,8 @@ func main() {
     router.Use(gin.Logger())
 	router.LoadHTMLGlob("templates/*.tmpl.html")
 
+	gin.SetMode(gin.ReleaseMode)
+	
 	router.GET("/", func(c *gin.Context) {
         c.HTML(http.StatusOK, "index.tmpl.html", nil)
     })
