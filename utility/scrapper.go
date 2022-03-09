@@ -9,11 +9,10 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/bwmarrin/discordgo"
 )
 
 type scrappedData struct {
-	contentId	int
+	articleNo	int
 	title 		string
 	link 		string
 	uploadedAt 	string
@@ -47,18 +46,24 @@ var (
 )
 
 // Get Info data parsed from scrapped data
-func getInfoData(ds *discordgo.Session) [][]string {
+func getInfoData() [][]string {
 	now := time.Now()
 	
 	results := make(chan infoData)
 	defer close(results)
 
-	lastIndexData := getLastIndexData(ds)
+	//lastIndexData := getLastIndexData(ds)
+	lastIndexData := []string{
+		"291363",
+		"291673",
+		"292026",
+		"291727",
+	}
 
 	fmt.Println("Reciving Data...")
 	for i:=0; i<len(urls); i++ {
-		contentId, _ := strconv.Atoi(lastIndexData[i])
-		go getScrappedData(i, contentId, results)
+		articleNo, _ := strconv.Atoi(lastIndexData[i])
+		go getScrappedData(i, articleNo, results)
 	}
 	
 	info := []infoData{}
@@ -86,7 +91,7 @@ func formatScrappedData(infoSet []infoData, lastIndexData []string) [][]string {
 		var tmpMsg string
 		for i, content := range info.data {
 			if i == 0 {
-				lastIndexData[info.idx] = strconv.Itoa(content.contentId)
+				lastIndexData[info.idx] = strconv.Itoa(content.articleNo)
 			}
 			tmpMsg = ""
 			tmpMsg = fmt.Sprint(tmpMsg, contentPropertyName[0])
@@ -122,7 +127,7 @@ func formatScrappedData(infoSet []infoData, lastIndexData []string) [][]string {
 }
 
 // Get scrapped data by using web scrapping concurrently
-func getScrappedData(idx int, lastContentId int, results chan<- infoData) {
+func getScrappedData(idx int, articleNo int, results chan<- infoData) {
 	req, err := http.NewRequest("GET", urls[idx], nil)
 	checkErr(err)
 	req.Close = true
@@ -140,10 +145,11 @@ func getScrappedData(idx int, lastContentId int, results chan<- infoData) {
 	scrapped := []scrappedData{}
 	
 	doc.Find("tbody").Find("tr").Each(func(i int, s *goquery.Selection) {
-		num, _ := strconv.Atoi(cleanString(s.Find(".b-num-box").Text()))
-		if num > lastContentId {
+		link, _ := s.Find(".b-title-box>a").Attr("href")
+		contentArticleNo := getArticleNo(link)
+
+		if contentArticleNo != -1 && contentArticleNo > articleNo {
 			title := cleanString(s.Find(".b-title-box>a").Text())
-			link, _ := s.Find(".b-title-box>a").Attr("href")
 			link = urls[idx] + link
 			
 			var uploadedAt string
@@ -154,7 +160,7 @@ func getScrappedData(idx int, lastContentId int, results chan<- infoData) {
 			})
 			
 			scrapped = append(scrapped, scrappedData{
-				contentId: num,
+				articleNo: contentArticleNo,
 				title: title,
 				link: link,
 				uploadedAt: uploadedAt,
@@ -168,6 +174,20 @@ func getScrappedData(idx int, lastContentId int, results chan<- infoData) {
 // Clean string by using strings.TrimSpace
 func cleanString(str string) string {
 	return strings.TrimSpace(str)
+}
+
+func getArticleNo(url string) int {
+	queryString := strings.Split(url[1:], "&")
+
+	for _, querySubString := range queryString {
+		query := strings.Split(querySubString, "=")
+		if query[0] == "articleNo" {
+			atricleNo, _ := strconv.Atoi(query[1])
+			return atricleNo
+		}
+	}
+
+	return -1
 }
 
 // Check that response's status code is 200
