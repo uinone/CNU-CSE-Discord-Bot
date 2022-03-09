@@ -1,5 +1,0 @@
-package controller
-
-func App() {
-
-}

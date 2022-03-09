@@ -9,44 +9,44 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-type bot struct {
-	discordSession *discordgo.Session
+type Bot struct {
+	DiscordSession *discordgo.Session
 	noticeDuration time.Duration
 	scrapper *scrapper
 	viewer *view.Viewer
 }
 
 // Create new bot object
-func NewBot(noticeDuration time.Duration) *bot {
+func NewBot(noticeDuration time.Duration) *Bot {
 	var err error
 
-	b := new(bot)
+	b := new(Bot)
 
 	b.noticeDuration = noticeDuration
 
-	b.viewer = view.NewViewer(b.discordSession)
+	b.viewer = view.NewViewer(b.DiscordSession)
 
 	token := os.Getenv("TOKEN")
-	b.discordSession, err = discordgo.New("Bot " + token)
+	b.DiscordSession, err = discordgo.New("Bot " + token)
 	if err != nil {
 		b.viewer.FatallnErrorToConsole(err)
 	}
 
-	err = b.discordSession.Open()
+	err = b.DiscordSession.Open()
 	if err != nil {
 		b.viewer.FatallnErrorToConsole(err)
 	}
 
-	b.scrapper = NewScrapper(b.discordSession)
+	b.scrapper = NewScrapper(b.DiscordSession)
 
-	loginMsg := b.discordSession.State.User.String() + " (" + b.discordSession.State.User.Username + ")에 로그인 되었습니다.\n"
+	loginMsg := b.DiscordSession.State.User.String() + " (" + b.DiscordSession.State.User.Username + ")에 로그인 되었습니다.\n"
 	b.viewer.PrintlnMsgToConsole(loginMsg)
 
 	return b
 }
 
 // Send information to specified channel
-func (b *bot) RunAlarm() {
+func (b *Bot) RunAlarm() {
 	ticker := time.NewTicker(b.noticeDuration)
 	go func() {
 		for t := range ticker.C {
@@ -62,14 +62,14 @@ func (b *bot) RunAlarm() {
 }
 
 // Get last articleNo of article
-func (b *bot) getLastArticleNoOfData() []string {
+func (b *Bot) getLastArticleNoOfData() []string {
 	var lastIndexData []string
 	flag := false
 
 	channelIds := b.getChannelIds()
 
 	for _, channelId := range channelIds {
-		msgs, _ := b.discordSession.ChannelMessages(channelId, 3, "", "", "")
+		msgs, _ := b.DiscordSession.ChannelMessages(channelId, 3, "", "", "")
 		for _, msg := range msgs {
 			if msg.Content[0] == '$' {
 				lastIndex := msg.Content[1:]
@@ -88,14 +88,14 @@ func (b *bot) getLastArticleNoOfData() []string {
 }
 
 // Get channel ids from guilds
-func (b *bot) getChannelIds() []string {
+func (b *Bot) getChannelIds() []string {
 	targetedChannelName := "컴공과-공지사항"
 	var channelIds []string
 
 	guildIds := b.getGuildIds()
 
 	for _, guildId := range guildIds {
-		channels, _ := b.discordSession.GuildChannels(guildId)
+		channels, _ := b.DiscordSession.GuildChannels(guildId)
 		for _, channel := range channels {
 			if (channel.Name == targetedChannelName) {
 				channelIds = append(channelIds, channel.ID)
@@ -107,10 +107,10 @@ func (b *bot) getChannelIds() []string {
 }
 
 // Get guild ids from guilds
-func (b *bot) getGuildIds() []string {
+func (b *Bot) getGuildIds() []string {
 	var guildIds []string
 
-	for _, guild := range b.discordSession.State.Guilds {
+	for _, guild := range b.DiscordSession.State.Guilds {
 		guildIds = append(guildIds, guild.ID)
 	}
 

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"GO/nomad/utility"
+	"GO/nomad/app/controller"
 	"log"
 	"net/http"
 	"os"
@@ -11,10 +11,9 @@ import (
 )
 
 func main() {
-	ds := utility.BotInit()
-	defer ds.Close()
+	controller := controller.NewController(time.Minute * 30)
 
-	utility.RunAlarm(ds, time.Minute * 30)
+	defer controller.Bot.DiscordSession.Close()
 
 	port := os.Getenv("PORT")
 	if port == "" {
