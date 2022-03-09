@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/bwmarrin/discordgo"
 )
 
 type scrappedData struct {
@@ -46,19 +47,13 @@ var (
 )
 
 // Get Info data parsed from scrapped data
-func getInfoData() [][]string {
+func getInfoData(ds *discordgo.Session) [][]string {
 	now := time.Now()
 	
 	results := make(chan infoData)
 	defer close(results)
 
-	//lastIndexData := getLastIndexData(ds)
-	lastIndexData := []string{
-		"291363",
-		"291673",
-		"292026",
-		"291727",
-	}
+	lastIndexData := getLastIndexData(ds)
 
 	fmt.Println("Reciving Data...")
 	for i:=0; i<len(urls); i++ {
