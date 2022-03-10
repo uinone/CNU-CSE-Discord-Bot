@@ -10,7 +10,7 @@ import (
 )
 
 type Bot struct {
-	DiscordSession *discordgo.Session
+	discordSession *discordgo.Session
 	noticeDuration time.Duration
 	scrapper *scrapper
 	viewer *view.Viewer
@@ -24,25 +24,30 @@ func NewBot(noticeDuration time.Duration) *Bot {
 
 	b.noticeDuration = noticeDuration
 
-	b.viewer = view.NewViewer(b.DiscordSession)
+	b.viewer = view.NewViewer(b.discordSession)
 
 	token := os.Getenv("TOKEN")
-	b.DiscordSession, err = discordgo.New("Bot " + token)
+	b.discordSession, err = discordgo.New("Bot " + token)
 	if err != nil {
 		b.viewer.FatallnErrorToConsole(err)
 	}
 
-	err = b.DiscordSession.Open()
+	err = b.discordSession.Open()
 	if err != nil {
 		b.viewer.FatallnErrorToConsole(err)
 	}
 
-	b.scrapper = NewScrapper(b.DiscordSession)
+	b.scrapper = NewScrapper(b.discordSession)
 
-	loginMsg := b.DiscordSession.State.User.String() + " (" + b.DiscordSession.State.User.Username + ")에 로그인 되었습니다.\n"
+	loginMsg := b.discordSession.State.User.String() + " (" + b.discordSession.State.User.Username + ")에 로그인 되었습니다.\n"
 	b.viewer.PrintlnMsgToConsole(loginMsg)
 
 	return b
+}
+
+// Getter of bot.discordSession
+func (b *Bot) GetDiscordSession() *discordgo.Session {
+	return b.discordSession
 }
 
 // Send information to specified channel
@@ -69,7 +74,7 @@ func (b *Bot) getLastArticleNoOfData() []string {
 	channelIds := b.getChannelIds()
 
 	for _, channelId := range channelIds {
-		msgs, _ := b.DiscordSession.ChannelMessages(channelId, 3, "", "", "")
+		msgs, _ := b.discordSession.ChannelMessages(channelId, 3, "", "", "")
 		for _, msg := range msgs {
 			if msg.Content[0] == '$' {
 				lastIndex := msg.Content[1:]
@@ -95,7 +100,7 @@ func (b *Bot) getChannelIds() []string {
 	guildIds := b.getGuildIds()
 
 	for _, guildId := range guildIds {
-		channels, _ := b.DiscordSession.GuildChannels(guildId)
+		channels, _ := b.discordSession.GuildChannels(guildId)
 		for _, channel := range channels {
 			if (channel.Name == targetedChannelName) {
 				channelIds = append(channelIds, channel.ID)
@@ -110,7 +115,7 @@ func (b *Bot) getChannelIds() []string {
 func (b *Bot) getGuildIds() []string {
 	var guildIds []string
 
-	for _, guild := range b.DiscordSession.State.Guilds {
+	for _, guild := range b.discordSession.State.Guilds {
 		guildIds = append(guildIds, guild.ID)
 	}
 
