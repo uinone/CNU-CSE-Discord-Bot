@@ -1,39 +1,14 @@
 package main
 
 import (
-	"GO/nomad/utility"
-	"log"
-	"net/http"
-	"os"
+	"GO/nomad/app/controller"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	ds := utility.BotInit()
-	defer ds.Close()
+	controller := controller.NewController()
+	defer controller.Bot.GetDiscordSession().Close()
 
-	utility.RunAlarm(ds, time.Minute * 30)
-
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "3000"
-	}
-
-    if port == "" {
-        log.Fatal("$PORT must be set")
-    }
-
-	router := gin.Default()
-    router.Use(gin.Logger())
-	router.LoadHTMLGlob("templates/*.tmpl.html")
-
-	gin.SetMode(gin.ReleaseMode)
-	
-	router.GET("/", func(c *gin.Context) {
-        c.HTML(http.StatusOK, "index.tmpl.html", nil)
-    })
-
-	router.Run(":" + port)
+	controller.BotRun(time.Minute * 30)
+	controller.WebRun()
 }
