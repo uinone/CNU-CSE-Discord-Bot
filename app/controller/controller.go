@@ -10,19 +10,22 @@ type controller struct {
 	Web *model.Web
 }
 
-func NewController(noticeDuration time.Duration) *controller {
+// Create controller object
+func NewController() *controller {
 	c := new(controller)
 
-	c.Bot = model.NewBot(noticeDuration)
+	c.Bot = model.NewBot()
 	c.Web = model.NewWeb(c.Bot.GetDiscordSession())
 
 	return c
 }
-
-func (c *controller) BotRun() {
-	c.Bot.RunAlarm()
+ 
+// Run alarm of bot
+func (c *controller) BotRun(alarmDuration time.Duration) {
+	c.Bot.RunAlarm(alarmDuration)
 }
 
+// Run web router
 func (c *controller) WebRun() {
 	c.Web.Run()
 }

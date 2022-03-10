@@ -11,11 +11,12 @@ import (
 )
 
 type Web struct {
-	port  string
-	router *gin.Engine
-	viwer *view.Viewer
+	port  	string
+	router 	*gin.Engine
+	viwer 	*view.Viewer
 }
 
+// Create web object
 func NewWeb(ds *discordgo.Session) *Web {
 	w := new(Web)
 
@@ -37,6 +38,7 @@ func NewWeb(ds *discordgo.Session) *Web {
 	return w
 }
 
+// Run router of gin
 func (w *Web) Run() {
 	gin.SetMode(gin.ReleaseMode)
 

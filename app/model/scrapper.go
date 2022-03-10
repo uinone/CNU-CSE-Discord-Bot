@@ -51,6 +51,7 @@ type infoData struct {
 	data []scrappedData
 }
 
+// Create scrapper object
 func NewScrapper(ds *discordgo.Session) *scrapper {
 	s := new(scrapper)
 

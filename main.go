@@ -6,9 +6,9 @@ import (
 )
 
 func main() {
-	controller := controller.NewController(time.Minute * 30)
+	controller := controller.NewController()
 	defer controller.Bot.GetDiscordSession().Close()
 
-	controller.BotRun()
+	controller.BotRun(time.Minute * 30)
 	controller.WebRun()
 }

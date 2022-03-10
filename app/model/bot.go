@@ -10,33 +10,31 @@ import (
 )
 
 type Bot struct {
-	discordSession *discordgo.Session
-	noticeDuration time.Duration
-	scrapper *scrapper
-	viewer *view.Viewer
+	discordSession 	*discordgo.Session
+	scrapper 		*scrapper
+	viewer 			*view.Viewer
 }
 
 // Create new bot object
-func NewBot(noticeDuration time.Duration) *Bot {
+func NewBot() *Bot {
 	var err error
 
 	b := new(Bot)
 
-	b.noticeDuration = noticeDuration
-
-	b.viewer = view.NewViewer(b.discordSession)
-
+	// Get *discord.Session with token
 	token := os.Getenv("TOKEN")
 	b.discordSession, err = discordgo.New("Bot " + token)
 	if err != nil {
 		b.viewer.FatallnErrorToConsole(err)
 	}
 
+	// Connect to bot
 	err = b.discordSession.Open()
 	if err != nil {
 		b.viewer.FatallnErrorToConsole(err)
 	}
-
+	
+	b.viewer = view.NewViewer(b.discordSession)
 	b.scrapper = NewScrapper(b.discordSession)
 
 	loginMsg := b.discordSession.State.User.String() + " (" + b.discordSession.State.User.Username + ")에 로그인 되었습니다.\n"
@@ -51,8 +49,8 @@ func (b *Bot) GetDiscordSession() *discordgo.Session {
 }
 
 // Send information to specified channel
-func (b *Bot) RunAlarm() {
-	ticker := time.NewTicker(b.noticeDuration)
+func (b *Bot) RunAlarm(alarmDuration time.Duration) {
+	ticker := time.NewTicker(alarmDuration)
 	go func() {
 		for t := range ticker.C {
 			b.viewer.PrintlnTimeToConsole(t)

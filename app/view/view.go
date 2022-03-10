@@ -34,8 +34,6 @@ func (v *Viewer) SendInfoToChannels(channelIds *[]string, infoSet *[][]string) {
 
 		v.SendMessageToChannels(channelIds, "업데이트가 완료됐어요!😀")
 	}
-
-	
 }
 
 // Send message to targeted channel
