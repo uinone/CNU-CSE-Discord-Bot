@@ -75,12 +75,15 @@ func (s *scrapper) getInfoData(lastIndexData []string) [][]string {
 
 	info := []infoData{}
 	for i := 0; i < len(urls); i++ {
-		info = append(info, <-results)
+		result := <-results
+		if result.data != nil {
+			info = append(info, result)
+		}
 	}
 
 	done := strconv.Itoa(int(time.Since(now).Seconds()))
 
-	recivingEndMsg := "Reciving Data done." + done
+	recivingEndMsg := "Reciving Data done in " + done + "sec."
 	s.viewer.PrintlnMsgToConsole(recivingEndMsg)
 
 	return s.formatScrappedData(info, lastIndexData)
@@ -98,6 +101,8 @@ func (s *scrapper) getScrappedData(idx int, articleNo int, results chan<- infoDa
 	res, err := client.Do(req)
 	if err != nil {
 		s.viewer.FatallnErrorToConsole(err)
+		results <- infoData{idx: idx, data: nil} // When "Get EOF" error occur
+		return
 	}
 	
 	if res.StatusCode != 200 {
