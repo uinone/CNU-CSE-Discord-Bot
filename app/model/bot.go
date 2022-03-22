@@ -20,6 +20,8 @@ func NewBot() *Bot {
 	var err error
 
 	b := new(Bot)
+	
+	b.viewer = view.NewViewer(b.discordSession)
 
 	// Get *discord.Session with token
 	token := os.Getenv("TOKEN")
@@ -34,7 +36,6 @@ func NewBot() *Bot {
 		b.viewer.FatallnErrorToConsole(err)
 	}
 	
-	b.viewer = view.NewViewer(b.discordSession)
 	b.scrapper = NewScrapper(b.discordSession)
 
 	loginMsg := b.discordSession.State.User.String() + " (" + b.discordSession.State.User.Username + ")에 로그인 되었습니다.\n"
