@@ -52,6 +52,7 @@
 
 - [Go 관련](#Go-관련)
   - Get "url" EOF
+  - 타임아웃을 조심해
 
 * [Heroku 관련](#Heroku-관련)
   - 서버가 죽고나면 벌어지는 일들
@@ -383,6 +384,43 @@ defer res.Body.Close()
 ```
 
 너무 안일하게 GET요청을 보냈던 것 같다..
+
+### 타임아웃을 조심해
+
+봇은 크롤링을 위해 접속하려는 url에 GET요청을 보낸다.
+
+근데 응답을 주기까지 너무 오래걸리면 요청 도중에 타임아웃이 돼서 GET EOF 에러가 발생한다.
+
+문제는 다른 url에서는 응답이 와서 데이터 파싱이 끝났는데, 하나의 url에서 문제가 발생하면 그 데이터가 싹다 날아가게 된다.
+
+따라서 나머지 데이터만이라도 공지 알림을 주기 위해 코드를 추가했다.
+
+#### 해결 방법
+
+GET 요청 도중 EOF 에러가 발생하면, infoData 객체의 data 프로퍼티 value를 nil로 만들어 채널에 보낸다.
+
+```go
+res, err := client.Do(req)
+if err != nil {
+	s.viewer.FatallnErrorToConsole(err)
+	results <- infoData{idx: idx, data: nil} // When "Get EOF" error occur
+	return
+}
+```
+
+채널에서 받아올 때, data 프로퍼티를 체크해서 nil이 아닌 경우만 데이터에 추가하도록 했다.
+
+```go
+info := []infoData{}
+for i := 0; i < len(urls); i++ {
+	result := <-results
+	if result.data != nil {
+		info = append(info, result)
+	}
+}
+```
+
+왜 타임아웃이 걸릴거라고 생각을 못했을까? 어이가 없다.
 
 ---
 
