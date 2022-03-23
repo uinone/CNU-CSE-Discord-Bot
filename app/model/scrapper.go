@@ -55,7 +55,8 @@ type infoData struct {
 func NewScrapper(ds *discordgo.Session) *scrapper {
 	s := new(scrapper)
 
-	s.viewer = view.NewViewer(ds)
+	s.viewer = view.NewViewer()
+	s.viewer.SetDiscordSession(ds)
 
 	return s
 }
@@ -99,18 +100,20 @@ func (s *scrapper) getScrappedData(idx int, articleNo int, results chan<- infoDa
 
 	client := &http.Client{}
 	res, err := client.Do(req)
+	
 	if err != nil {
 		s.viewer.FatallnErrorToConsole(err)
 		results <- infoData{idx: idx, data: nil} // When "Get EOF" error occur
+		res.Body.Close()
 		return
 	}
+
+	defer res.Body.Close()
 	
 	if res.StatusCode != 200 {
 		statusErrorMsg := "Request failed with Status:" + strconv.Itoa(res.StatusCode)
 		s.viewer.FatallnMsgToConsole(statusErrorMsg)
 	}
-
-	defer res.Body.Close()
 
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	if err != nil {

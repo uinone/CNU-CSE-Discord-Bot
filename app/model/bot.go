@@ -21,7 +21,7 @@ func NewBot() *Bot {
 
 	b := new(Bot)
 	
-	b.viewer = view.NewViewer(b.discordSession)
+	b.viewer = view.NewViewer()
 
 	// Get *discord.Session with token
 	token := os.Getenv("TOKEN")
@@ -29,6 +29,8 @@ func NewBot() *Bot {
 	if err != nil {
 		b.viewer.FatallnErrorToConsole(err)
 	}
+
+	b.viewer.SetDiscordSession(b.discordSession)
 
 	// Connect to bot
 	err = b.discordSession.Open()

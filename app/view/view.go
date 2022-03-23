@@ -13,12 +13,15 @@ type Viewer struct {
 }
 
 // Create new Viewer object
-func NewViewer(ds *discordgo.Session) *Viewer {
+func NewViewer() *Viewer {
 	v := new(Viewer)
 
-	v.discordSession = ds
-
 	return v
+}
+
+// Set discordSession of Viewer instance
+func (v *Viewer) SetDiscordSession(ds *discordgo.Session) {
+	v.discordSession = ds
 }
 
 // Send information to specified channel

@@ -20,7 +20,8 @@ type Web struct {
 func NewWeb(ds *discordgo.Session) *Web {
 	w := new(Web)
 
-	w.viwer = view.NewViewer(ds)
+	w.viwer = view.NewViewer()
+	w.viwer.SetDiscordSession(ds)
 
 	w.port = os.Getenv("PORT")
 	if w.port == "" {
