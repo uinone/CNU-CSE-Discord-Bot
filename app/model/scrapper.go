@@ -101,10 +101,15 @@ func (s *scrapper) getScrappedData(idx int, articleNo int, results chan<- infoDa
 	client := &http.Client{}
 	res, err := client.Do(req)
 	
+	// When err isn't nil, res has nil.
+	// Therefore there is no response body to close.
+	// If you try to close response body, can see nothing but memory error caused by nil.
+	//
+	// When "Get EOF" error occur, 
+	// function send infoData object has nil in data property.
 	if err != nil {
-		s.viewer.FatallnErrorToConsole(err)
-		results <- infoData{idx: idx, data: nil} // When "Get EOF" error occur
-		res.Body.Close()
+		s.viewer.PrintlnErrorToConsole(err)
+		results <- infoData{idx: idx, data: nil} 
 		return
 	}
 

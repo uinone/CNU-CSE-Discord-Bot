@@ -56,12 +56,17 @@ func (v *Viewer) PrintlnTimeToConsole(t time.Time) {
 	fmt.Println(t)
 }
 
-// Print error type log to console
+// Print error to console
+func (v *Viewer) PrintlnErrorToConsole(err error) {
+	fmt.Println(err)
+}
+
+// Print error type log to console and exit
 func (v *Viewer) FatallnErrorToConsole(err error) {
 	log.Fatalln(err)
 }
 
-// Print string type log to console
+// Print string type log to console and exit
 func (v *Viewer) FatallnMsgToConsole(msg string) {
 	log.Fatalln(msg)
 }
