@@ -117,7 +117,9 @@ func (s *scrapper) getScrappedData(idx int, articleNo int, results chan<- infoDa
 	
 	if res.StatusCode != 200 {
 		statusErrorMsg := "Request failed with Status:" + strconv.Itoa(res.StatusCode)
-		s.viewer.FatallnMsgToConsole(statusErrorMsg)
+		s.viewer.PrintlnMsgToConsole(statusErrorMsg)
+		results <- infoData{idx: idx, data: nil} 
+		return
 	}
 
 	doc, err := goquery.NewDocumentFromReader(res.Body)
